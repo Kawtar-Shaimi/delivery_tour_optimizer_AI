@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: dto-008-add-indexes
+      author: Kawtar-Shaimi
+      changes:
+        - createIndex:
+            tableName: deliveries
+            indexName: idx_deliveries_customer_id
+            columns:
+              - column:
+                  name: customer_id
+        - createIndex:
+            tableName: customers
+            indexName: idx_customers_name
+            columns:
+              - column:
+                  name: name
+      rollback:
+        - dropIndex:
+            tableName: deliveries
+            indexName: idx_deliveries_customer_id
+        - dropIndex:
+            tableName: customers
+            indexName: idx_customers_name
