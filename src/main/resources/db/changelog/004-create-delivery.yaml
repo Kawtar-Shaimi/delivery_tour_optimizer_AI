@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: dto-004-create-delivery
+      author: Kawtar-Shaimi
+      changes:
+        - createTable:
+            tableName: deliveries
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column: { name: address, type: VARCHAR(255) }
+              - column: { name: latitude, type: DOUBLE }
+              - column: { name: longitude, type: DOUBLE }
+              - column: { name: weight, type: DOUBLE }
+              - column: { name: volume, type: DOUBLE }
+              - column: { name: time_slot, type: VARCHAR(50) }
+              - column: { name: planned_time, type: TIME }
+              - column: { name: actual_time, type: TIME }
+              - column: { name: delivery_order, type: INT }
+              - column: { name: status, type: VARCHAR(50) }
+              - column: { name: tour_id, type: BIGINT }
+        - addForeignKeyConstraint:
+            baseTableName: deliveries
+            baseColumnNames: tour_id
+            referencedTableName: tours
+            referencedColumnNames: id
+            constraintName: fk_delivery_tour
+        - createIndex:
+            tableName: deliveries
+            indexName: idx_delivery_status
+            columns:
+              - column: { name: status }
+      rollback:
+        - dropIndex:
+            tableName: deliveries
+            indexName: idx_delivery_status
+        - dropTable:
+            tableName: deliveries
