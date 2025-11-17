@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/delivery_optimizer_qa}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    username: ${DB_USER:delivery_user}
+    password: ${DB_PASS:change-me}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+  sql:
+    init:
+      mode: never
+  liquibase:
+    enabled: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: INFO
