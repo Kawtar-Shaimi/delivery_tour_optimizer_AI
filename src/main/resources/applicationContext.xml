@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/data/jpa
+                           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- ACTIVER LES REPOSITORIES JPA -->
+    <jpa:repositories base-package="com.dto.delivery_tour_optimizer.repository"/>
+
+    <!-- OPTIMIZERS -->
+    <bean id="nearestNeighborOptimizer" class="com.dto.delivery_tour_optimizer.service.NearestNeighborOptimizer"/>
+    <bean id="clarkeWrightOptimizer" class="com.dto.delivery_tour_optimizer.service.ClarkeWrightOptimizer"/>
+
+    <!-- REPOSITORIES - SPRING DATA LES CRÉERA AUTOMATIQUEMENT -->
+
+    <!-- SERVICES -->
+    <bean id="deliveryService" class="com.dto.delivery_tour_optimizer.service.DeliveryService">
+        <constructor-arg ref="deliveryRepository"/>
+    </bean>
+
+    <bean id="vehicleService" class="com.dto.delivery_tour_optimizer.service.VehicleService">
+        <constructor-arg ref="vehicleRepository"/>
+    </bean>
+
+    <bean id="warehouseService" class="com.dto.delivery_tour_optimizer.service.WarehouseService">
+        <constructor-arg ref="warehouseRepository"/>
+    </bean>
+
+    <bean id="tourService" class="com.dto.delivery_tour_optimizer.service.TourService">
+        <constructor-arg name="tourRepository" ref="tourRepository"/>
+        <constructor-arg name="deliveryRepository" ref="deliveryRepository"/>
+        <constructor-arg name="vehicleRepository" ref="vehicleRepository"/>
+        <constructor-arg name="warehouseRepository" ref="warehouseRepository"/>
+        <constructor-arg name="nearestNeighborOptimizer" ref="nearestNeighborOptimizer"/>
+        <constructor-arg name="clarkeWrightOptimizer" ref="clarkeWrightOptimizer"/>
+    </bean>
+
+    <!-- CONTROLLERS -->
+    <bean id="tourController" class="com.dto.delivery_tour_optimizer.controller.TourController">
+        <constructor-arg ref="tourService"/>
+    </bean>
+
+    <bean id="deliveryController" class="com.dto.delivery_tour_optimizer.controller.DeliveryController">
+        <constructor-arg ref="deliveryService"/>
+        <constructor-arg ref="tourService"/>
+    </bean>
+
+    <bean id="vehicleController" class="com.dto.delivery_tour_optimizer.controller.VehicleController">
+        <constructor-arg ref="vehicleService"/>
+    </bean>
+
+    <bean id="warehouseController" class="com.dto.delivery_tour_optimizer.controller.WarehouseController">
+        <constructor-arg ref="warehouseService"/>
+    </bean>
+
+</beans>
