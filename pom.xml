@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.6</version> <!-- CHANGÉ: Version compatible -->
+        <version>3.2.6</version> <!-- ⚠️ IMPORTANT: Compatible avec Spring AI 0.8.1 -->
         <relativePath/>
     </parent>
     <groupId>com.dto</groupId>
@@ -17,8 +17,29 @@
 
     <properties>
         <java.version>17</java.version>
-        <springdoc.version>2.5.0</springdoc.version> <!-- CHANGÉ: Version compatible -->
+        <spring-ai.version>0.8.1</spring-ai.version> <!-- Version stable -->
+        <springdoc.version>2.3.0</springdoc.version> <!-- Version compatible -->
     </properties>
+
+    <!-- REPOSITORIES SPRING AI -->
+    <repositories>
+        <repository>
+            <id>spring-snapshots</id>
+            <name>Spring Snapshots</name>
+            <url>https://repo.spring.io/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -47,13 +68,21 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- SPRINGDOC - VERSION COMPATIBLE -->
+        <!-- SpringDoc OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
 
+        <!-- SPRING AI OLLAMA -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+            <version>${spring-ai.version}</version>
+        </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -70,6 +99,11 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.9.2</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
