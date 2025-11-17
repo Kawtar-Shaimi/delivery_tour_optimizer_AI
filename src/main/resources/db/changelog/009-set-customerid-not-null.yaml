@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: dto-009-set-customerid-not-null
+      author: Kawtar-Shaimi
+      preConditions:
+        - onFail: CONTINUE
+          not:
+            - tableExists:
+                tableName: deliveries
+      changes: []
+  - changeSet:
+      id: dto-009-set-customerid-not-null-apply
+      author: Kawtar-Shaimi
+      preConditions:
+        - onFail: MARK_RAN
+          columnExists:
+            tableName: deliveries
+            columnName: customer_id
+      changes:
+        - addNotNullConstraint:
+            tableName: deliveries
+            columnName: customer_id
+            columnDataType: BIGINT
+      rollback:
+        - dropNotNullConstraint:
+            tableName: deliveries
+            columnName: customer_id
+            columnDataType: BIGINT
