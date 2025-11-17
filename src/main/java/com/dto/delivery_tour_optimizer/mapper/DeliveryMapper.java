@@ -16,7 +16,10 @@ public class DeliveryMapper {
                 .volume(delivery.getVolume())
                 .timeSlot(delivery.getTimeSlot())
                 .status(delivery.getStatus())
+                .plannedTime(delivery.getPlannedTime() != null ? delivery.getPlannedTime().toString() : null)
+                .actualTime(delivery.getActualTime() != null ? delivery.getActualTime().toString() : null)
                 .tourId(delivery.getTour() != null ? delivery.getTour().getId() : null)
+                .customerId(delivery.getCustomer() != null ? delivery.getCustomer().getId() : null)
                 .deliveryOrder(delivery.getDeliveryOrder())
                 .build();
     }
@@ -31,6 +34,8 @@ public class DeliveryMapper {
                 .volume(dto.getVolume())            // ← CORRECTION: dto.getVolume()
                 .timeSlot(dto.getTimeSlot())        // ← CORRECTION: dto.getTimeSlot()
                 .status(dto.getStatus())            // ← CORRECTION: dto.getStatus()
+                .plannedTime(dto.getPlannedTime() != null ? java.time.LocalTime.parse(dto.getPlannedTime()) : null)
+                .actualTime(dto.getActualTime() != null ? java.time.LocalTime.parse(dto.getActualTime()) : null)
                 .tour(tour)
                 .deliveryOrder(dto.getDeliveryOrder()) // ← CORRECTION: dto.getDeliveryOrder()
                 .build();
