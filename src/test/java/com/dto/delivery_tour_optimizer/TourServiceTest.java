@@ -1,17 +1,14 @@
 package com.dto.delivery_tour_optimizer;
 
-import com.dto.delivery_tour_optimizer.dto.TourRequestDTO;
 import com.dto.delivery_tour_optimizer.model.Delivery;
-import com.dto.delivery_tour_optimizer.model.Vehicle;
 import com.dto.delivery_tour_optimizer.model.Warehouse;
 import com.dto.delivery_tour_optimizer.repository.*;
 import com.dto.delivery_tour_optimizer.service.ClarkeWrightOptimizer;
 import com.dto.delivery_tour_optimizer.service.NearestNeighborOptimizer;
+import com.dto.delivery_tour_optimizer.service.TourOptimizer;
 import com.dto.delivery_tour_optimizer.service.TourService;
 import org.junit.jupiter.api.Test;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -26,7 +23,9 @@ public class TourServiceTest {
                 mock(VehicleRepository.class),
                 mock(WarehouseRepository.class),
                 mock(NearestNeighborOptimizer.class),
-                mock(ClarkeWrightOptimizer.class)
+                mock(ClarkeWrightOptimizer.class),
+                mock(TourOptimizer.class),
+                mock(DeliveryHistoryRepository.class)
         );
 
         Warehouse warehouse = new Warehouse();
@@ -47,7 +46,9 @@ public class TourServiceTest {
                 mock(VehicleRepository.class),
                 mock(WarehouseRepository.class),
                 mock(NearestNeighborOptimizer.class),
-                mock(ClarkeWrightOptimizer.class)
+                mock(ClarkeWrightOptimizer.class),
+                mock(TourOptimizer.class),
+                mock(DeliveryHistoryRepository.class)
         );
 
         Warehouse warehouse = new Warehouse();

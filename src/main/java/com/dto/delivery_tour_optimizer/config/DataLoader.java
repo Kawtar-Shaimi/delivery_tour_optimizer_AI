@@ -4,21 +4,28 @@ import com.dto.delivery_tour_optimizer.model.*;
 import com.dto.delivery_tour_optimizer.model.enums.VehicleType;
 import com.dto.delivery_tour_optimizer.repository.*;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalTime;
+
 @Component
+@Profile("dev")
 public class DataLoader implements CommandLineRunner {
 
     private final WarehouseRepository warehouseRepository;
     private final VehicleRepository vehicleRepository;
     private final DeliveryRepository deliveryRepository;
+    private final CustomerRepository customerRepository;
 
     public DataLoader(WarehouseRepository warehouseRepository,
                       VehicleRepository vehicleRepository,
-                      DeliveryRepository deliveryRepository) {
+                      DeliveryRepository deliveryRepository,
+                      CustomerRepository customerRepository) {
         this.warehouseRepository = warehouseRepository;
         this.vehicleRepository = vehicleRepository;
         this.deliveryRepository = deliveryRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -62,6 +69,26 @@ public class DataLoader implements CommandLineRunner {
                 .build();
         vehicleRepository.save(truck);
 
+        // Créer des clients
+        Customer customerA = Customer.builder()
+                .name("Client A")
+                .address("Client 1 Address")
+                .latitude(34.0522 + 0.01)
+                .longitude(-118.2437 + 0.01)
+                .preferredTimeSlot("09:00-12:00")
+                .build();
+
+        Customer customerB = Customer.builder()
+                .name("Client B")
+                .address("Client 2 Address")
+                .latitude(34.0522 + 0.02)
+                .longitude(-118.2437 + 0.02)
+                .preferredTimeSlot("13:00-16:00")
+                .build();
+
+        customerRepository.save(customerA);
+        customerRepository.save(customerB);
+
         // Créer des livraisons de test
         for (int i = 1; i <= 5; i++) {
             Delivery delivery = Delivery.builder()
@@ -70,7 +97,10 @@ public class DataLoader implements CommandLineRunner {
                     .longitude(-118.2437 + (i * 0.01))
                     .weight(5.0 * i)    // 5kg, 10kg, 15kg, 20kg, 25kg
                     .volume(0.2 * i)    // 0.2m³, 0.4m³, 0.6m³, 0.8m³, 1.0m³
-                    .timeSlot("09:00-12:00")
+                    .timeSlot(i % 2 == 0 ? customerB.getPreferredTimeSlot() : customerA.getPreferredTimeSlot())
+                    .plannedTime(LocalTime.of(9 + i, 0))
+                    .actualTime(LocalTime.of(9 + i, 15))
+                    .customer(i % 2 == 0 ? customerB : customerA)
                     .build();
             deliveryRepository.save(delivery);
         }

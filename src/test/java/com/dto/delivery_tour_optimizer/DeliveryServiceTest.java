@@ -1,12 +1,12 @@
 package com.dto.delivery_tour_optimizer;
 
 import com.dto.delivery_tour_optimizer.model.Delivery;
+import com.dto.delivery_tour_optimizer.repository.CustomerRepository;
 import com.dto.delivery_tour_optimizer.repository.DeliveryRepository;
 import com.dto.delivery_tour_optimizer.service.DeliveryService;
 import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -16,7 +16,8 @@ public class DeliveryServiceTest {
     public void testGetAllDeliveries() {
         // Arrange
         DeliveryRepository repository = mock(DeliveryRepository.class);
-        DeliveryService service = new DeliveryService(repository);
+        CustomerRepository customerRepository = mock(CustomerRepository.class);
+        DeliveryService service = new DeliveryService(repository, customerRepository);
 
         Delivery delivery1 = new Delivery();
         delivery1.setId(1L);
@@ -37,7 +38,7 @@ public class DeliveryServiceTest {
     public void testDeleteDelivery() {
         // Arrange
         DeliveryRepository repository = mock(DeliveryRepository.class);
-        DeliveryService service = new DeliveryService(repository);
+        DeliveryService service = new DeliveryService(repository, mock(CustomerRepository.class));
 
         // Act
         service.deleteDelivery(1L);
