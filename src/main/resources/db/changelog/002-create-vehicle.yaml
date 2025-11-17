@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: dto-002-create-vehicle
+      author: Kawtar-Shaimi
+      changes:
+        - createTable:
+            tableName: vehicle
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(50)
+              - column:
+                  name: license_plate
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column: { name: max_weight, type: DOUBLE }
+              - column: { name: max_volume, type: DOUBLE }
+              - column: { name: max_deliveries, type: INT }
+        - addUniqueConstraint:
+            tableName: vehicle
+            constraintName: uk_vehicle_license_plate
+            columnNames: license_plate
+      rollback:
+        - dropUniqueConstraint:
+            tableName: vehicle
+            constraintName: uk_vehicle_license_plate
+        - dropTable:
+            tableName: vehicle
