@@ -16,7 +16,10 @@ public class DeliveryDTO {
     private double weight;
     private double volume;
     private String timeSlot;
+    private String plannedTime;
+    private String actualTime;
     private DeliveryStatus status;
     private Long tourId;
+    private Long customerId;
     private Integer deliveryOrder; // Ordre dans la tournée
 }
