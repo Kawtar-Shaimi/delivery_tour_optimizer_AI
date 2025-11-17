@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: dto-005-create-customer
+      author: Kawtar-Shaimi
+      changes:
+        - createTable:
+            tableName: customers
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column: { name: address, type: VARCHAR(255) }
+              - column: { name: latitude, type: DOUBLE }
+              - column: { name: longitude, type: DOUBLE }
+              - column: { name: preferred_time_slot, type: VARCHAR(50) }
+      rollback:
+        - dropTable:
+            tableName: customers
