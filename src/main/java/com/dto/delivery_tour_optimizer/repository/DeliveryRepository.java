@@ -27,10 +27,10 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     long countByStatus(DeliveryStatus status);
 
     @Query("select d from Delivery d join DeliveryHistory h on h.delivery = d " +
-            "where (:name is null or lower(d.customer.name) like lower(concat('%',:name,'%'))) " +
-            "and (:startDate is null or h.deliveryDate >= :startDate) " +
-            "and (:endDate is null or h.deliveryDate <= :endDate) " +
-            "and (:minDelay is null or h.delayMinutes >= :minDelay)")
+           "where (:name is null or lower(d.customer.name) like lower(concat('%',:name,'%'))) " +
+           "and (:startDate is null or h.deliveryDate >= :startDate) " +
+           "and (:endDate is null or h.deliveryDate <= :endDate) " +
+           "and (:minDelay is null or h.delayMinutes >= :minDelay)")
     Page<Delivery> searchDeliveries(
             @Param("name") String name,
             @Param("startDate") LocalDate startDate,

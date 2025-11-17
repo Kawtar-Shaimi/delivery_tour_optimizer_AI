@@ -3,12 +3,15 @@ package com.dto.delivery_tour_optimizer.service;
 import com.dto.delivery_tour_optimizer.model.Delivery;
 import com.dto.delivery_tour_optimizer.model.Vehicle;
 import com.dto.delivery_tour_optimizer.model.Warehouse;
+import org.springframework.stereotype.Component; // ← AJOUT
+
 import java.util.*;
 import java.util.logging.Logger;
 
+@Component("nearestNeighborOptimizer")
 public class NearestNeighborOptimizer implements TourOptimizer {
 
-    // Logger simple
+
     private static final Logger logger = Logger.getLogger(NearestNeighborOptimizer.class.getName());
 
     @Override

@@ -17,7 +17,7 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
     private final TourService tourService;
 
-    @GetMapping
+   @GetMapping
     public List<Delivery> getAllDeliveries() {
         return deliveryService.getAllDeliveries();
     }

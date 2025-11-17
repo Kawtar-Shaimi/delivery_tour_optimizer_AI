@@ -1,5 +1,6 @@
 package com.dto.delivery_tour_optimizer.model;
 
+import com.dto.delivery_tour_optimizer.model.enums.TourStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -20,6 +21,9 @@ public class Tour {
     private LocalDate date;
     private double totalDistance; // en km
 
+    @Enumerated(EnumType.STRING)
+    private TourStatus status;
+
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
@@ -30,5 +34,6 @@ public class Tour {
 
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL)
     @OrderBy("deliveryOrder ASC")
+    @Builder.Default
     private List<Delivery> deliveries = new ArrayList<>();
 }

@@ -2,18 +2,16 @@ package com.dto.delivery_tour_optimizer.service;
 
 import com.dto.delivery_tour_optimizer.model.Warehouse;
 import com.dto.delivery_tour_optimizer.repository.WarehouseRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class WarehouseService {
 
-    private WarehouseRepository warehouseRepository;
-
-    // Injecter dans CONSTRUCTEUR
-    public WarehouseService(WarehouseRepository warehouseRepository) {
-        this.warehouseRepository = warehouseRepository;
-    }
+    private final WarehouseRepository warehouseRepository;
 
     public List<Warehouse> getAllWarehouses() {
         return warehouseRepository.findAll();

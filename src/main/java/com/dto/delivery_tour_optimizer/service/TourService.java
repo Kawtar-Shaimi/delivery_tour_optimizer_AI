@@ -1,42 +1,47 @@
 package com.dto.delivery_tour_optimizer.service;
 
 import com.dto.delivery_tour_optimizer.dto.TourRequestDTO;
-import com.dto.delivery_tour_optimizer.model.*;
-import com.dto.delivery_tour_optimizer.repository.*;
-import lombok.Getter;
-import lombok.Setter;
+import com.dto.delivery_tour_optimizer.model.Delivery;
+import com.dto.delivery_tour_optimizer.model.DeliveryHistory;
+import com.dto.delivery_tour_optimizer.model.Tour;
+import com.dto.delivery_tour_optimizer.model.Vehicle;
+import com.dto.delivery_tour_optimizer.model.Warehouse;
+import com.dto.delivery_tour_optimizer.model.enums.TourStatus;
+import com.dto.delivery_tour_optimizer.repository.DeliveryHistoryRepository;
+import com.dto.delivery_tour_optimizer.repository.DeliveryRepository;
+import com.dto.delivery_tour_optimizer.repository.TourRepository;
+import com.dto.delivery_tour_optimizer.repository.VehicleRepository;
+import com.dto.delivery_tour_optimizer.repository.WarehouseRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-@Getter
-@Setter
+/**
+ * Service pour l'optimisation des tournées de livraison
+ */
+@Service
+@Transactional
+@RequiredArgsConstructor
 public class TourService {
 
     private static final Logger logger = Logger.getLogger(TourService.class.getName());
 
-    private TourRepository tourRepository;
-    private DeliveryRepository deliveryRepository;
-    private VehicleRepository vehicleRepository;
-    private WarehouseRepository warehouseRepository;
-    private TourOptimizer nearestNeighborOptimizer;
-    private TourOptimizer clarkeWrightOptimizer;
-
-    // CONSTRUCTEUR CORRIGÉ
-    public TourService(TourRepository tourRepository,
-                       DeliveryRepository deliveryRepository,
-                       VehicleRepository vehicleRepository,
-                       WarehouseRepository warehouseRepository,
-                       TourOptimizer nearestNeighborOptimizer,
-                       TourOptimizer clarkeWrightOptimizer) {
-        this.tourRepository = tourRepository;
-        this.deliveryRepository = deliveryRepository;
-        this.vehicleRepository = vehicleRepository;
-        this.warehouseRepository = warehouseRepository;
-        this.nearestNeighborOptimizer = nearestNeighborOptimizer;
-        this.clarkeWrightOptimizer = clarkeWrightOptimizer;
-
-        logger.info("✅ TourService initialisé avec toutes les dépendances");
-    }
+    private final TourRepository tourRepository;
+    private final DeliveryRepository deliveryRepository;
+    private final VehicleRepository vehicleRepository;
+    private final WarehouseRepository warehouseRepository;
+    private final @Qualifier("nearestNeighborOptimizer") TourOptimizer nearestNeighborOptimizer;
+    private final @Qualifier("clarkeWrightOptimizer") TourOptimizer clarkeWrightOptimizer;
+    private final @Qualifier("aiOptimizer") TourOptimizer aiOptimizer;
+    private final DeliveryHistoryRepository deliveryHistoryRepository;
 
     public List<Delivery> getOptimizedTour(TourRequestDTO request) {
         logger.info("🚀 Demande d'optimisation - Algorithme: " + request.getOptimizerType());
@@ -74,9 +79,13 @@ public class TourService {
             throw new RuntimeException("Volume total trop élevé pour ce véhicule. Maximum: " + vehicle.getMaxVolume() + " m³");
         }
 
-        TourOptimizer optimizer = request.getOptimizerType().equals("NEAREST_NEIGHBOR")
-                ? nearestNeighborOptimizer
-                : clarkeWrightOptimizer;
+        String type = request.getOptimizerType() == null ? "" : request.getOptimizerType().toUpperCase();
+        TourOptimizer optimizer = switch (type) {
+            case "AI" -> aiOptimizer;
+            case "NEAREST_NEIGHBOR" -> nearestNeighborOptimizer;
+            case "CLARKE_WRIGHT" -> clarkeWrightOptimizer;
+            default -> nearestNeighborOptimizer;
+        };
 
         logger.info("⚡ Lancement de l'algorithme: " + request.getOptimizerType());
         List<Delivery> optimizedRoute = optimizer.calculateOptimalTour(deliveries, warehouse, vehicle);
@@ -87,6 +96,54 @@ public class TourService {
 
         logger.info("✅ Optimisation terminée - " + optimizedRoute.size() + " livraisons organisées");
         return optimizedRoute;
+    }
+
+    public Tour updateTourStatus(Long tourId, TourStatus newStatus) {
+        if (newStatus == null) {
+            throw new IllegalArgumentException("Tour status must not be null");
+        }
+
+        Tour tour = tourRepository.findById(tourId)
+                .orElseThrow(() -> new RuntimeException("Tour not found with id: " + tourId));
+
+        TourStatus previousStatus = tour.getStatus();
+        tour.setStatus(newStatus);
+
+        if (newStatus == TourStatus.COMPLETED && previousStatus != TourStatus.COMPLETED) {
+            createHistoriesForCompletedTour(tour);
+        }
+
+        return tourRepository.save(tour);
+    }
+
+    private void createHistoriesForCompletedTour(Tour tour) {
+        LocalDate deliveryDate = tour.getDate() != null ? tour.getDate() : LocalDate.now();
+        List<DeliveryHistory> histories = new ArrayList<>();
+
+        for (Delivery delivery : tour.getDeliveries()) {
+            DeliveryHistory history = DeliveryHistory.builder()
+                    .tour(tour)
+                    .delivery(delivery)
+                    .customer(delivery.getCustomer())
+                    .deliveryDate(deliveryDate)
+                    .plannedTime(delivery.getPlannedTime())
+                    .actualTime(delivery.getActualTime())
+                    .delayMinutes(calculateDelay(delivery.getPlannedTime(), delivery.getActualTime()))
+                    .dayOfWeek(deliveryDate.getDayOfWeek())
+                    .build();
+            histories.add(history);
+        }
+
+        if (!histories.isEmpty()) {
+            deliveryHistoryRepository.saveAll(histories);
+        }
+    }
+
+    private long calculateDelay(LocalTime planned, LocalTime actual) {
+        if (planned == null || actual == null) {
+            return 0L;
+        }
+        return Duration.between(planned, actual).toMinutes();
     }
 
     public double getTotalDistance(List<Delivery> route, Warehouse warehouse) {
@@ -109,29 +166,4 @@ public class TourService {
         logger.info("📏 Distance totale calculée: " + total + " km");
         return total;
     }
-
-//    // Getters et Setters (inchangés)
-//    public void setTourRepository(TourRepository tourRepository) {
-//        this.tourRepository = tourRepository;
-//    }
-//
-//    public void setDeliveryRepository(DeliveryRepository deliveryRepository) {
-//        this.deliveryRepository = deliveryRepository;
-//    }
-//
-//    public void setVehicleRepository(VehicleRepository vehicleRepository) {
-//        this.vehicleRepository = vehicleRepository;
-//    }
-//
-//    public void setWarehouseRepository(WarehouseRepository warehouseRepository) {
-//        this.warehouseRepository = warehouseRepository;
-//    }
-//
-//    public void setNearestNeighborOptimizer(TourOptimizer nearestNeighborOptimizer) {
-//        this.nearestNeighborOptimizer = nearestNeighborOptimizer;
-//    }
-//
-//    public void setClarkeWrightOptimizer(TourOptimizer clarkeWrightOptimizer) {
-//        this.clarkeWrightOptimizer = clarkeWrightOptimizer;
-//    }
 }
