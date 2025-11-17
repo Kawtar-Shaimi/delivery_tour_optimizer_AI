@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: dto-007-add-customer-to-delivery
+      author: Kawtar-Shaimi
+      changes:
+        - addColumn:
+            tableName: deliveries
+            columns:
+              - column: { name: customer_id, type: BIGINT }
+        - addForeignKeyConstraint:
+            baseTableName: deliveries
+            baseColumnNames: customer_id
+            referencedTableName: customers
+            referencedColumnNames: id
+            constraintName: fk_delivery_customer
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: deliveries
+            constraintName: fk_delivery_customer
+        - dropColumn:
+            tableName: deliveries
+            columnName: customer_id
