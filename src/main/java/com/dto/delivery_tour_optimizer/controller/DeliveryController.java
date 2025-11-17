@@ -4,31 +4,19 @@ import com.dto.delivery_tour_optimizer.model.Delivery;
 import com.dto.delivery_tour_optimizer.service.DeliveryService;
 import com.dto.delivery_tour_optimizer.service.TourService;
 import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/deliveries")
+@RequiredArgsConstructor
 public class DeliveryController {
 
-    private DeliveryService deliveryService;
-    private TourService tourService;
+    private final DeliveryService deliveryService;
+    private final TourService tourService;
 
-    // CONSTRUCTEUR
-    public DeliveryController(DeliveryService deliveryService, TourService tourService) {
-        this.deliveryService = deliveryService;
-        this.tourService = tourService;
-    }
-
-    // AJOUTEZ CES SETTERS
-    public void setDeliveryService(DeliveryService deliveryService) {
-        this.deliveryService = deliveryService;
-    }
-
-    public void setTourService(TourService tourService) {
-        this.tourService = tourService;
-    }
     @GetMapping
     public List<Delivery> getAllDeliveries() {
         return deliveryService.getAllDeliveries();
