@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: dto-003-create-tour
+      author: Kawtar-Shaimi
+      changes:
+        - createTable:
+            tableName: tours
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column: { name: date, type: DATE }
+              - column: { name: total_distance, type: DOUBLE }
+              - column: { name: status, type: VARCHAR(50), defaultValue: PLANNED }
+              - column: { name: vehicle_id, type: BIGINT }
+              - column: { name: warehouse_id, type: BIGINT }
+        - addForeignKeyConstraint:
+            baseTableName: tours
+            baseColumnNames: vehicle_id
+            referencedTableName: vehicle
+            referencedColumnNames: id
+            constraintName: fk_tour_vehicle
+        - addForeignKeyConstraint:
+            baseTableName: tours
+            baseColumnNames: warehouse_id
+            referencedTableName: warehouse
+            referencedColumnNames: id
+            constraintName: fk_tour_warehouse
+      rollback:
+        - dropTable:
+            tableName: tours
