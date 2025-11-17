@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: dto-001-create-warehouse
+      author: Kawtar-Shaimi
+      changes:
+        - createTable:
+            tableName: warehouse
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column: { name: address, type: VARCHAR(255) }
+              - column: { name: latitude, type: DOUBLE }
+              - column: { name: longitude, type: DOUBLE }
+              - column: { name: opening_hours, type: VARCHAR(50) }
+      rollback:
+        - dropTable:
+            tableName: warehouse
