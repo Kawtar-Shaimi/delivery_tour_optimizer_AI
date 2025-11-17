@@ -35,7 +35,7 @@ build/
 # Fichiers de configuration sécurisés
 application-secure.properties
 application-prod.properties
-*.env
+.env
 
 # Clés et certificats
 *.key
@@ -46,3 +46,11 @@ application-prod.properties
 # Fichiers sensibles personnalisés
 config/secure/
 secrets/
+
+# Logs
+*.log
+logs/
+
+# Fichiers temporaires
+*.tmp
+*.temp
