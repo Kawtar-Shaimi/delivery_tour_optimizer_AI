@@ -2,6 +2,7 @@ package com.dto.delivery_tour_optimizer.controller;
 
 import com.dto.delivery_tour_optimizer.model.Vehicle;
 import com.dto.delivery_tour_optimizer.service.VehicleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,14 +10,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/vehicles")
+@RequiredArgsConstructor
 public class VehicleController {
 
     private final VehicleService vehicleService;
-
-    // Constructeur avec injection
-    public VehicleController(VehicleService vehicleService) {
-        this.vehicleService = vehicleService;
-    }
 
     @GetMapping
     public List<Vehicle> getAllVehicles() {
