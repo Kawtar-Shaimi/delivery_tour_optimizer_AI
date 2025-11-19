@@ -8,6 +8,10 @@ import com.dto.delivery_tour_optimizer.service.TourService;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,11 +26,17 @@ public class TourController {
     private final TourService tourService;
 
     @PostMapping("/optimize")
-    @Operation(summary = "Optimize a tour", description = "Optimize the tour for given deliveries, warehouse and vehicle using selected optimizer")
-    public List<DeliveryDTO> optimizeTour(@RequestBody TourRequestDTO request) {
+    @Operation(summary = "Optimize a tour (paginated)", description = "Optimize and return a Page with pageable metadata")
+    public Page<DeliveryDTO> optimizeTour(@RequestBody TourRequestDTO request,
+                                          @ParameterObject Pageable pageable) {
         List<Delivery> route = tourService.getOptimizedTour(request);
         DeliveryMapper mapper = new DeliveryMapper();
-        return route.stream().map(mapper::toDTO).collect(Collectors.toList());
+        List<DeliveryDTO> all = route.stream().map(mapper::toDTO).collect(Collectors.toList());
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), all.size());
+        List<DeliveryDTO> pageContent = start >= all.size() ? java.util.List.of() : all.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, all.size());
     }
 
     @GetMapping("/test")

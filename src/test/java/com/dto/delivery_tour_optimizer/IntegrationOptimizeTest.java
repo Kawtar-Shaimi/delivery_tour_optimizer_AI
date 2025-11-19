@@ -31,6 +31,7 @@ class IntegrationOptimizeTest {
     @Autowired private WarehouseRepository warehouseRepository;
     @Autowired private VehicleRepository vehicleRepository;
     @Autowired private DeliveryRepository deliveryRepository;
+    @Autowired private CustomerRepository customerRepository;
 
     private Warehouse wh;
     private Vehicle vh;
@@ -56,6 +57,24 @@ class IntegrationOptimizeTest {
         vh.setMaxDeliveries(50);
         vehicleRepository.save(vh);
 
+        // Create test customers
+        Customer c1 = Customer.builder()
+                .name("Client A")
+                .address("AddrA")
+                .latitude(48.85)
+                .longitude(2.35)
+                .preferredTimeSlot("AM")
+                .build();
+        Customer c2 = Customer.builder()
+                .name("Client B")
+                .address("AddrB")
+                .latitude(48.86)
+                .longitude(2.36)
+                .preferredTimeSlot("PM")
+                .build();
+        c1 = customerRepository.save(c1);
+        c2 = customerRepository.save(c2);
+
         for (int i=0;i<3;i++){
             Delivery d = new Delivery();
             d.setAddress("Addr"+i);
@@ -64,6 +83,8 @@ class IntegrationOptimizeTest {
             d.setWeight(10.0);
             d.setVolume(5.0);
             d.setStatus(DeliveryStatus.PENDING);
+            // Assign a customer (NOT NULL FK)
+            d.setCustomer(i % 2 == 0 ? c1 : c2);
             deliveryRepository.save(d);
         }
     }
@@ -82,6 +103,8 @@ class IntegrationOptimizeTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").exists());
+                .andExpect(jsonPath("$.content[0].id").exists())
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
+                .andExpect(jsonPath("$.totalElements").isNumber());
     }
 }
